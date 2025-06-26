@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import * as THREE from 'three';
@@ -11,9 +11,9 @@ const portfolioData = {
     tagline: "Full-Stack Developer & Creative Technologist",
     about: "Selamat datang di portofolio interaktif saya. Saya adalah seorang engineer perangkat lunak dengan hasrat untuk menciptakan pengalaman digital yang mulus dan menarik secara visual. Keahlian saya terletak pada perpaduan antara backend yang tangguh dan frontend yang dinamis.",
     projects: [
-        { title: "Platform Analitik Real-Time", description: "Membangun dasbor analitik performa tinggi yang memproses dan memvisualisasikan jutaan titik data per menit." },
-        { title: "Proyek: Mesin Rekomendasi E-commerce", description: "Mengembangkan layanan mikro yang menyediakan rekomendasi produk yang dipersonalisasi, meningkatkan keterlibatan pengguna sebesar 25%." },
-        { title: "Proyek: Instalasi Seni Interaktif", description: "Berkolaborasi dalam sebuah instalasi seni generatif yang merespons gerakan pengunjung, menggunakan React dan Three.js." }
+        { title: "Analitik Real-Time", description: "Membangun dasbor analitik performa tinggi yang memproses dan memvisualisasikan jutaan titik data per menit menggunakan arsitektur berbasis event." },
+        { title: "Mesin Rekomendasi", description: "Mengembangkan layanan mikro yang menyediakan rekomendasi produk yang dipersonalisasi, meningkatkan keterlibatan pengguna sebesar 25%." },
+        { title: "Instalasi Seni", description: "Berkolaborasi dalam sebuah instalasi seni generatif yang merespons gerakan pengunjung, menggunakan React dan Three.js untuk menciptakan visual yang imersif." }
     ],
     contact: {
         email: "mailto:ganti.dengan.email.valid@anda.com",
@@ -22,12 +22,54 @@ const portfolioData = {
     }
 };
 
+// Komponen untuk Terminal Proyek
+function ProjectsTerminal() {
+    const [activeIndex, setActiveIndex] = useState(0);
+    const descriptionRef = useRef(null);
+
+    const handleTabClick = (index) => {
+        if (activeIndex === index) return;
+        
+        // Animasi fade out
+        gsap.to(descriptionRef.current, {
+            opacity: 0,
+            duration: 0.2,
+            ease: 'power2.in',
+            onComplete: () => {
+                // Ganti konten setelah fade out
+                setActiveIndex(index);
+                // Animasi fade in
+                gsap.fromTo(descriptionRef.current, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' });
+            }
+        });
+    };
+
+    return (
+        <div className="projects-terminal">
+            <div className="project-tabs">
+                {portfolioData.projects.map((project, index) => (
+                    <button 
+                        key={index} 
+                        className={`project-tab ${index === activeIndex ? 'active' : ''}`}
+                        onClick={() => handleTabClick(index)}
+                    >
+                        {project.title}
+                    </button>
+                ))}
+            </div>
+            <div ref={descriptionRef} className="project-description-panel">
+                <p>{portfolioData.projects[activeIndex].description}</p>
+            </div>
+        </div>
+    );
+}
+
+
 export default function App() {
     const canvasRef = useRef(null);
     const mainContainerRef = useRef(null);
 
     useEffect(() => {
-        // --- Inisialisasi Scene Three.js ---
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({
@@ -38,7 +80,6 @@ export default function App() {
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-        // --- Logika Pembuatan Galaksi ---
         const parameters = { count: 200000, size: 0.01, radius: 8, branches: 5, spin: 1, randomness: 0.5, randomnessPower: 4, insideColor: '#ff6030', outsideColor: '#1b3984' };
         
         const geometry = new THREE.BufferGeometry();
@@ -70,7 +111,6 @@ export default function App() {
         scene.add(points);
         camera.position.set(0, 2, 15);
         
-        // --- TIMELINE UTAMA GSAP UNTUK SEMUA ANIMASI ---
         const mainContainer = mainContainerRef.current;
         const sections = gsap.utils.toArray(".section");
         
@@ -80,7 +120,7 @@ export default function App() {
                 pin: true, 
                 scrub: 1.5,
                 start: "top top",
-                end: "+=5000",
+                end: "+=6000", // PERBAIKAN: Memberi ruang scroll lebih panjang
             }
         });
 
@@ -96,26 +136,17 @@ export default function App() {
         });
 
         sections.forEach(section => {
-            const content = section.querySelector('.section-content');
-            // Animasikan elemen di dalam section-content
-            const elementsToAnimate = content.querySelectorAll("h2, p, .projects-list, .contact-links");
-
+            const elementsToAnimate = section.querySelectorAll(".section-content > *:not(h2)");
+            gsap.from(section.querySelector("h2"), {
+                 y: 50, opacity: 0, duration: 1, ease: 'power3.out',
+                 scrollTrigger: { trigger: section, containerAnimation: masterTimeline, start: 'left center' }
+            });
             gsap.from(elementsToAnimate, {
-                y: 50,
-                opacity: 0,
-                duration: 1,
-                ease: 'power3.out',
-                stagger: 0.2,
-                scrollTrigger: {
-                    trigger: section,
-                    containerAnimation: masterTimeline, 
-                    start: 'left center', 
-                }
+                y: 50, opacity: 0, duration: 1, ease: 'power3.out', stagger: 0.2,
+                scrollTrigger: { trigger: section, containerAnimation: masterTimeline, start: 'left center+=100' }
             });
         });
 
-        
-        // --- Loop Animasi & Penanganan Resize ---
         const clock = new THREE.Clock();
         const animate = () => {
             points.rotation.y += clock.getDelta() * 0.05;
@@ -143,7 +174,7 @@ export default function App() {
     }, []);
 
     return (
-        <div ref={mainContainerRef} style={{height: "500vh"}}>
+        <div ref={mainContainerRef} style={{height: "600vh"}}>
             <div className="content-container">
                 <canvas id="galaxy-canvas" ref={canvasRef}></canvas>
                 <div className="intro-view">
@@ -162,14 +193,7 @@ export default function App() {
                     <section className="section">
                         <div className="section-content">
                             <h2>Proyek Unggulan</h2>
-                            <div className="projects-list"> 
-                                {portfolioData.projects.map((project, index) => (
-                                    <div key={index} className="project-item">
-                                        <h3>{project.title}</h3>
-                                        <p>{project.description}</p>
-                                    </div>
-                                ))}
-                            </div>
+                            <ProjectsTerminal />
                         </div>
                     </section>
                     <section className="section">
