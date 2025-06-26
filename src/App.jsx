@@ -15,6 +15,21 @@ const portfolioData = {
         { category: "Backend", items: ["Node.js", "Express", "Python", "REST APIs", "GraphQL"] },
         { category: "Lainnya", items: ["Git & GitHub", "Docker", "MongoDB", "PostgreSQL", "Webpack"] }
     ],
+    // PENAMBAHAN BAGIAN BARU
+    experiences: [
+        {
+            role: "Software Engineer Intern",
+            organization: "Tech Corp Alpha",
+            duration: "Juni 2024 - Agustus 2024",
+            description: "Berkontribusi pada pengembangan fitur utama untuk produk SaaS perusahaan, menggunakan React dan Node.js. Berkolaborasi dalam tim agile untuk merilis pembaruan setiap dua minggu."
+        },
+        {
+            role: "Freelance Web Developer",
+            organization: "Klien Startup",
+            duration: "2023 - Sekarang",
+            description: "Membangun dan meluncurkan beberapa situs web e-commerce dan portofolio untuk klien, dengan fokus pada desain responsif dan pengalaman pengguna yang optimal."
+        }
+    ],
     organizationalExperience: [
         {
             role: "Ketua Divisi Teknologi",
@@ -22,12 +37,6 @@ const portfolioData = {
             duration: "2023 - 2024",
             description: "Memimpin tim yang terdiri dari 15 anggota untuk mengembangkan dan memelihara situs web organisasi, serta menyelenggarakan beberapa lokakarya pemrograman untuk mahasiswa."
         },
-        {
-            role: "Koordinator Acara",
-            organization: "Pekan IT Tahunan",
-            duration: "2022",
-            description: "Merancang dan mengelola serangkaian acara teknologi, termasuk kompetisi coding dan seminar, yang menarik lebih dari 500 peserta dari berbagai universitas."
-        }
     ],
     projects: [
         { title: "SISTEM ANALITIK", description: "Membangun dasbor analitik performa tinggi yang memproses dan memvisualisasikan jutaan titik data per menit menggunakan arsitektur berbasis event." },
@@ -129,15 +138,17 @@ export default function App() {
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             
             const galaxies = {
-                A: generateGalaxy({ count: 200000, size: 0.01, radius: 8, branches: 5, spin: 1, insideColor: '#ff6030', outsideColor: '#1b3984' }),
-                B: generateGalaxy({ count: 150000, size: 0.015, radius: 6, branches: 3, spin: -1.5, insideColor: '#90cdf4', outsideColor: '#a855f7' }),
-                C: generateGalaxy({ count: 250000, size: 0.01, radius: 10, branches: 7, spin: 0.5, insideColor: '#4ade80', outsideColor: '#16a34a' }),
-                D: generateGalaxy({ count: 180000, size: 0.012, radius: 7, branches: 4, spin: 2, insideColor: '#facc15', outsideColor: '#b45309' }),
-                E: generateGalaxy({ count: 300000, size: 0.008, radius: 12, branches: 6, spin: -0.8, insideColor: '#f472b6', outsideColor: '#be185d' })
+                A: generateGalaxy({ count: 200000, size: 0.01, radius: 8, branches: 5, spin: 1, insideColor: '#ff6030', outsideColor: '#1b3984' }), // Profile
+                B: generateGalaxy({ count: 180000, size: 0.012, radius: 9, branches: 4, spin: 1.2, insideColor: '#34d399', outsideColor: '#059669' }), // Experiences
+                C: generateGalaxy({ count: 150000, size: 0.015, radius: 6, branches: 3, spin: -1.5, insideColor: '#90cdf4', outsideColor: '#a855f7' }), // Skills
+                D: generateGalaxy({ count: 250000, size: 0.01, radius: 10, branches: 7, spin: 0.5, insideColor: '#4ade80', outsideColor: '#16a34a' }), // Org
+                E: generateGalaxy({ count: 180000, size: 0.012, radius: 7, branches: 4, spin: 2, insideColor: '#facc15', outsideColor: '#b45309' }), // Projects
+                F: generateGalaxy({ count: 300000, size: 0.008, radius: 12, branches: 6, spin: -0.8, insideColor: '#f472b6', outsideColor: '#be185d' })  // Contact
             };
-
+            
             Object.values(galaxies).forEach((galaxy, index) => {
-                if (index > 0) galaxy.visible = false;
+                galaxy.visible = (index === 0);
+                galaxy.material.opacity = (index === 0) ? 1 : 0;
                 scene.add(galaxy);
             });
 
@@ -151,37 +162,49 @@ export default function App() {
                     pin: contentContainerRef.current, 
                     scrub: 1.5,
                     start: "top top",
-                    end: "bottom+=400% bottom", 
+                    end: "bottom+=500% bottom", 
                 }
             });
 
-            const createGalaxyTransition = (from, to, wrapperId) => {
-                masterTimeline.to(camera.position, { z: 15, y: 2, ease: "power1.inOut" });
-                masterTimeline.to(`#${from.wrapper}-wrapper`, { autoAlpha: 0, pointerEvents: 'none' }, "<");
-                
-                masterTimeline.to(from.galaxy, { onStart: () => { to.galaxy.visible = true; }});
-                masterTimeline.to(from.galaxy.material, { opacity: 0, onComplete: () => { from.galaxy.visible = false; }}, ">-0.5");
-                masterTimeline.to(to.galaxy.material, { opacity: 1 }, "<");
-                masterTimeline.to(camera.rotation, { y: `+=${Math.PI * 0.5}`, ease: "power2.inOut"}, "<");
+            const createGalaxyTransition = (from, to, fromWrapper, toWrapper) => {
+                masterTimeline
+                    .addLabel(`start-travel-${toWrapper}`)
+                    .to(camera.position, { z: 15, y: 2, ease: "power1.inOut" })
+                    .to(`#${fromWrapper}-wrapper`, { autoAlpha: 0, pointerEvents: 'none' }, "<")
+                    
+                    .call(() => { to.galaxy.visible = true; })
+                    .to(from.galaxy.material, { opacity: 0, onComplete: () => { from.galaxy.visible = false; }})
+                    .to(to.galaxy.material, { opacity: 1 }, "<")
+                    .to(camera.rotation, { y: `+=${Math.PI * 0.5}`, ease: "power2.inOut"}, "<")
 
-                masterTimeline.to(camera.position, { z: 2.5, y: -0.2, ease: "power1.inOut" });
-                masterTimeline.to(to.galaxy.rotation, { y: `+=${Math.PI * 0.15}` }, "<");
-                masterTimeline.to(`#${to.wrapper}-wrapper`, { autoAlpha: 1, pointerEvents: 'auto' }, "<0.5");
-                masterTimeline.to({}, { duration: 1.5 }); // Tahan
+                    .to(camera.position, { z: 2.5, y: -0.2, ease: "power1.inOut" })
+                    .to(to.galaxy.rotation, { y: `+=${Math.PI * 0.15}` }, "<")
+                    .to(`#${toWrapper}-wrapper`, { autoAlpha: 1, pointerEvents: 'auto' }, "<0.5")
+                    .to({}, { duration: 1.5 });
             };
             
-            // Perjalanan Antar Galaksi
-            masterTimeline.to(".intro-view", { autoAlpha: 0 });
-            createGalaxyTransition({ galaxy: galaxies.A, wrapper: 'none' }, { galaxy: galaxies.A, wrapper: 'profile' }); // Initial zoom-in
-            createGalaxyTransition({ galaxy: galaxies.A, wrapper: 'profile' }, { galaxy: galaxies.B, wrapper: 'skills' });
-            createGalaxyTransition({ galaxy: galaxies.B, wrapper: 'skills' }, { galaxy: galaxies.C, wrapper: 'org' });
-            createGalaxyTransition({ galaxy: galaxies.C, wrapper: 'org' }, { galaxy: galaxies.D, wrapper: 'projects' });
-            createGalaxyTransition({ galaxy: galaxies.D, wrapper: 'projects' }, { galaxy: galaxies.E, wrapper: 'contact' });
+            // Alur Perjalanan Antar Galaksi yang baru
+            masterTimeline
+                .to(".intro-view", { autoAlpha: 0 })
+                .to(camera.position, { z: 2.5, y: -0.2, ease: "power1.inOut" }, "<")
+                .to(galaxies.A.rotation, { y: Math.PI * 0.25 }, "<")
+                .to("#profile-wrapper", { autoAlpha: 1, pointerEvents: 'auto' }, "<0.5");
+
+            masterTimeline.to({}, { duration: 1.5 }); 
+
+            // Rantai transisi antar 6 galaksi
+            createGalaxyTransition(galaxies.A, galaxies.B, 'profile', 'experiences');
+            createGalaxyTransition(galaxies.B, galaxies.C, 'experiences', 'skills');
+            createGalaxyTransition(galaxies.C, galaxies.D, 'skills', 'org');
+            createGalaxyTransition(galaxies.D, galaxies.E, 'org', 'projects');
+            createGalaxyTransition(galaxies.E, galaxies.F, 'projects', 'contact');
 
             const clock = new THREE.Clock();
             const animate = () => {
                 const delta = clock.getDelta();
-                Object.values(galaxies).forEach((g, i) => g.rotation.y += delta * (0.05 + i * 0.01));
+                Object.values(galaxies).forEach((g, i) => {
+                    if (g.visible) g.rotation.y += delta * (0.05 + i * 0.01);
+                });
                 renderer.render(scene, camera);
                 requestAnimationFrame(animate);
             };
@@ -206,7 +229,7 @@ export default function App() {
     }, []);
 
     return (
-        <div ref={mainContainerRef} style={{height: "1200vh"}}>
+        <div ref={mainContainerRef} style={{height: "1500vh"}}>
             <div ref={contentContainerRef} className="content-container">
                 <canvas id="galaxy-canvas" ref={canvasRef}></canvas>
                 
@@ -222,6 +245,21 @@ export default function App() {
                     <div className="section-content">
                         <h2>PROFIL MISI</h2>
                         <p>{portfolioData.profile}</p>
+                    </div>
+                </div>
+
+                <div id="experiences-wrapper" className="section-wrapper">
+                    <div className="section-content">
+                        <h2>LOG PENGALAMAN</h2>
+                        <div className="org-timeline">
+                            {portfolioData.experiences.map(exp => (
+                                <div key={exp.role} className="timeline-item">
+                                    <h3>{exp.role}</h3>
+                                    <h4>{exp.organization} | {exp.duration}</h4>
+                                    <p>{exp.description}</p>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
