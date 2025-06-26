@@ -9,7 +9,20 @@ gsap.registerPlugin(ScrollTrigger);
 const portfolioData = {
     name: "Nama Anda",
     tagline: "Full-Stack Developer & Creative Technologist",
-    about: "Selamat datang di portofolio interaktif saya. Saya adalah seorang engineer perangkat lunak dengan hasrat untuk menciptakan pengalaman digital yang mulus dan menarik secara visual. Keahlian saya terletak pada perpaduan antara backend yang tangguh dan frontend yang dinamis.",
+    profile: "Selamat datang di portofolio interaktif saya. Saya adalah seorang engineer perangkat lunak dengan hasrat untuk menciptakan pengalaman digital yang mulus dan menarik secara visual. Keahlian saya terletak pada perpaduan antara backend yang tangguh dan frontend yang dinamis.",
+    skills: [
+        { category: "Frontend", items: ["React", "JavaScript (ES6+)", "HTML5 & CSS3", "GSAP", "Three.js"] },
+        { category: "Backend", items: ["Node.js", "Express", "Python", "REST APIs", "GraphQL"] },
+        { category: "Lainnya", items: ["Git & GitHub", "Docker", "MongoDB", "PostgreSQL", "Webpack"] }
+    ],
+    organizationalExperience: [
+        {
+            role: "Ketua Divisi Teknologi",
+            organization: "Himpunan Mahasiswa XYZ",
+            duration: "2023 - 2024",
+            description: "Memimpin tim yang terdiri dari 15 anggota untuk mengembangkan dan memelihara situs web organisasi, serta menyelenggarakan beberapa lokakarya pemrograman untuk mahasiswa."
+        },
+    ],
     projects: [
         { title: "SISTEM ANALITIK", description: "Membangun dasbor analitik performa tinggi yang memproses dan memvisualisasikan jutaan titik data per menit menggunakan arsitektur berbasis event." },
         { title: "MESIN REKOMENDASI", description: "Mengembangkan layanan mikro yang menyediakan rekomendasi produk yang dipersonalisasi, meningkatkan keterlibatan pengguna sebesar 25%." },
@@ -45,20 +58,20 @@ function ProjectsConsole() {
     };
 
     return (
-        <div className="projects-console">
-            <div className="targets-list">
+        <div className="projects-system">
+            <div className="star-map-list">
                 {portfolioData.projects.map((project, index) => (
                     <div 
                         key={index} 
-                        className={`target-item ${index === activeIndex ? 'active' : ''}`}
+                        className={`star-map-entry ${index === activeIndex ? 'active' : ''}`}
                         onClick={() => handleTargetClick(index)}
                     >
                         {project.title}
                     </div>
                 ))}
             </div>
-            <div ref={hologramScreenRef} className="hologram-screen">
-                <h3>{portfolioData.projects[activeIndex].title}</h3>
+            <div ref={hologramScreenRef} className="project-info-panel">
+                 <h3>{portfolioData.projects[activeIndex].title}</h3>
                 <p>{portfolioData.projects[activeIndex].description}</p>
             </div>
         </div>
@@ -109,118 +122,76 @@ export default function App() {
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             
-            // Galaksi A (About)
-            const galaxyA = generateGalaxy({ count: 200000, size: 0.01, radius: 8, branches: 5, spin: 1, randomness: 0.5, randomnessPower: 4, insideColor: '#ff6030', outsideColor: '#1b3984' });
-            scene.add(galaxyA);
-
-            // Galaksi B (Projects)
-            const galaxyB = generateGalaxy({ count: 150000, size: 0.015, radius: 6, branches: 3, spin: -1.5, randomness: 0.8, randomnessPower: 3, insideColor: '#90cdf4', outsideColor: '#a855f7' });
-            galaxyB.visible = false;
-            scene.add(galaxyB);
+            const galaxies = [
+                generateGalaxy({ count: 200000, size: 0.01, radius: 8, branches: 5, spin: 1, insideColor: '#ff6030', outsideColor: '#1b3984' }), // Profile
+                generateGalaxy({ count: 150000, size: 0.015, radius: 6, branches: 3, spin: -1.5, insideColor: '#90cdf4', outsideColor: '#a855f7' }), // Skills
+                generateGalaxy({ count: 250000, size: 0.01, radius: 10, branches: 7, spin: 0.5, insideColor: '#4ade80', outsideColor: '#16a34a' }), // Org
+                generateGalaxy({ count: 180000, size: 0.012, radius: 7, branches: 4, spin: 2, insideColor: '#facc15', outsideColor: '#b45309' }), // Projects
+                generateGalaxy({ count: 300000, size: 0.008, radius: 12, branches: 6, spin: -0.8, insideColor: '#f472b6', outsideColor: '#be185d' })  // Contact
+            ];
             
-            // Galaksi C (Contact)
-            const galaxyC = generateGalaxy({ count: 250000, size: 0.01, radius: 10, branches: 7, spin: 0.5, randomness: 0.4, randomnessPower: 4, insideColor: '#4ade80', outsideColor: '#16a34a' });
-            galaxyC.visible = false;
-            scene.add(galaxyC);
-
-            const galaxyD = generateGalaxy({ count: 200000, size: 0.01, radius: 8, branches: 5, spin: 1, randomness: 0.5, randomnessPower: 4, insideColor: '#ff6030', outsideColor: '#1b3984' });
-            scene.add(galaxyD);
-
-            const galaxyE = generateGalaxy({ count: 200000, size: 0.01, radius: 8, branches: 5, spin: 1, randomness: 0.5, randomnessPower: 4, insideColor: '#ff6030', outsideColor: '#1b3984' });
-            scene.add(galaxyE);
-
+            galaxies.forEach((galaxy, index) => {
+                galaxy.visible = (index === 0);
+                galaxy.material.opacity = (index === 0) ? 1 : 0;
+                scene.add(galaxy);
+            });
 
             camera.position.set(0, 2, 15);
             
-            const mainContainer = mainContainerRef.current;
+            const sections = gsap.utils.toArray(".section-wrapper");
             
             const masterTimeline = gsap.timeline({
                 scrollTrigger: {
-                    trigger: mainContainer,
+                    trigger: mainContainerRef.current,
                     pin: contentContainerRef.current, 
                     scrub: 1.5,
                     start: "top top",
-                    end: "bottom+=100% bottom", 
+                    end: `+=${sections.length * 1500}`
                 }
             });
 
-            // Bagian 1: Zoom ke Galaksi A (About)
-            masterTimeline
-                .to(".intro-view", { autoAlpha: 0 })
-                .to(camera.position, { z: 2.5, y: -0.2, ease: "power1.inOut" }, "<")
-                .to(galaxyA.rotation, { y: Math.PI * 0.25 }, "<")
-                .to("#about-wrapper", { autoAlpha: 1, pointerEvents: 'auto' }, "<0.5");
+            // PERBAIKAN TOTAL: Alur animasi yang lebih logis
+            sections.forEach((section, index) => {
+                const currentGalaxy = galaxies[index-1] || galaxies[0];
+                
+                // Animasi Intro
+                if (index === 0) {
+                    masterTimeline.to(section, { autoAlpha: 0, duration: 1 }, "+=1.5");
+                } else {
+                    const prevGalaxy = galaxies[index - 2] || galaxies[0];
+                    
+                    // Zoom In
+                    masterTimeline
+                      .addLabel(`section-${index}`)
+                      .to(camera.position, { z: 2.5, y: -0.2, ease: "power1.inOut" }, `section-${index}`)
+                      .to(currentGalaxy.rotation, { y: `+=${Math.PI * 0.25}` }, `section-${index}`)
+                      .fromTo(section, { autoAlpha: 0 }, { autoAlpha: 1, pointerEvents: 'auto' }, `section-${index}`);
+                    
+                    // Tahan
+                    if(index < sections.length - 1) {
+                         masterTimeline.to({}, {duration: 1.5});
+                    }
 
-            masterTimeline.to({}, { duration: 1 }); // Tahan
-
-            // Bagian 2: Zoom out dari Galaksi A & Transisi ke B
-            masterTimeline
-                .to(camera.position, { z: 15, y: 2, ease: "power1.inOut" })
-                .to("#about-wrapper", { autoAlpha: 0, pointerEvents: 'none' }, "<")
-                .to(galaxyA, { onStart: () => { galaxyB.visible = true; } })
-                .to(galaxyA.material, { opacity: 0, onComplete: () => { galaxyA.visible = false; } }, ">-0.5")
-                .to(galaxyB.material, { opacity: 1 }, "<")
-                .to(camera.rotation, { y: Math.PI * 1, ease: "power2.inOut"}, "<");
-
-            // Bagian 3: Zoom ke Galaksi B (Projects)
-            masterTimeline
-                .to(camera.position, { z: 3.5, y: 0, ease: "power1.inOut" })
-                .to(galaxyB.rotation, { y: Math.PI * 0.3 }, "<")
-                .to("#projects-wrapper", { autoAlpha: 1, pointerEvents: 'auto' }, "<0.5");
-            
-            masterTimeline.to({}, { duration: 1 }); // Tahan
-
-            // Bagian 4: Zoom out dari Galaksi B & Transisi ke C
-            masterTimeline
-                .to(camera.position, { z: 15, y: 2, ease: "power1.inOut" })
-                .to("#projects-wrapper", { autoAlpha: 0, pointerEvents: 'none' }, "<")
-                .to(galaxyB, { onStart: () => { galaxyC.visible = true; } })
-                .to(galaxyB.material, { opacity: 0, onComplete: () => { galaxyB.visible = false; } }, ">-0.5")
-                .to(galaxyC.material, { opacity: 1 }, "<")
-                .to(camera.rotation, { y: Math.PI * 2, ease: "power2.inOut"}, "<");
-
-            // Bagian 5: Zoom ke Galaksi C (Contact)
-            masterTimeline
-                .to(camera.position, { z: 2.5, y: -0.2, ease: "power1.inOut" })
-                .to(galaxyC.rotation, { y: Math.PI * 0.15 }, "<")
-                .to("#contact-wrapper", { autoAlpha: 1, pointerEvents: 'auto' }, "<0.5");
-
-            masterTimeline
-                .to(camera.position, { z: 15, y: 2, ease: "power1.inOut" })
-                .to("#about-wrapper", { autoAlpha: 0, pointerEvents: 'none' }, "<")
-                .to(galaxyA, { onStart: () => { galaxyB.visible = true; } })
-                .to(galaxyA.material, { opacity: 0, onComplete: () => { galaxyA.visible = false; } }, ">-0.5")
-                .to(galaxyB.material, { opacity: 1 }, "<")
-                .to(camera.rotation, { y: Math.PI * 1, ease: "power2.inOut"}, "<");
-
-            masterTimeline
-                .to(camera.position, { z: 3.5, y: 0, ease: "power1.inOut" })
-                .to(galaxyB.rotation, { y: Math.PI * 0.3 }, "<")
-                .to("#projects-wrapper", { autoAlpha: 1, pointerEvents: 'auto' }, "<0.5");
-            
-            masterTimeline.to({}, { duration: 1 });
-
-            masterTimeline
-                .to(camera.position, { z: 15, y: 2, ease: "power1.inOut" })
-                .to("#about-wrapper", { autoAlpha: 0, pointerEvents: 'none' }, "<")
-                .to(galaxyA, { onStart: () => { galaxyB.visible = true; } })
-                .to(galaxyA.material, { opacity: 0, onComplete: () => { galaxyA.visible = false; } }, ">-0.5")
-                .to(galaxyB.material, { opacity: 1 }, "<")
-                .to(camera.rotation, { y: Math.PI * 1, ease: "power2.inOut"}, "<");
-
-                masterTimeline
-                .to(".intro-view", { autoAlpha: 0 })
-                .to(camera.position, { z: 2.5, y: -0.2, ease: "power1.inOut" }, "<")
-                .to(galaxyA.rotation, { y: Math.PI * 0.25 }, "<")
-                .to("#about-wrapper", { autoAlpha: 1, pointerEvents: 'auto' }, "<0.5");
-
+                    // Transisi galaksi
+                    if (index < galaxies.length) {
+                        const nextGalaxy = galaxies[index];
+                        masterTimeline
+                          .to(camera.position, { z: 15, y: 2, ease: "power1.inOut" })
+                          .to(section, { autoAlpha: 0, pointerEvents: 'none' }, "<")
+                          .call(() => { nextGalaxy.visible = true; })
+                          .to(currentGalaxy.material, { opacity: 0, onComplete: () => { currentGalaxy.visible = false; }})
+                          .to(nextGalaxy.material, { opacity: 1 }, "<")
+                          .to(camera.rotation, { y: `+=${Math.PI * 0.5}`, ease: "power2.inOut"}, "<");
+                    }
+                }
+            });
 
             const clock = new THREE.Clock();
             const animate = () => {
                 const delta = clock.getDelta();
-                galaxyA.rotation.y += delta * 0.05;
-                galaxyB.rotation.y += delta * 0.08;
-                galaxyC.rotation.y += delta * 0.03;
+                galaxies.forEach((g) => {
+                    if (g.visible) g.rotation.y += delta * 0.05;
+                });
                 renderer.render(scene, camera);
                 requestAnimationFrame(animate);
             };
@@ -245,7 +216,7 @@ export default function App() {
     }, []);
 
     return (
-        <div ref={mainContainerRef} style={{height: "1000vh"}}>
+        <div ref={mainContainerRef} style={{height: "1200vh"}}>
             <div ref={contentContainerRef} className="content-container">
                 <canvas id="galaxy-canvas" ref={canvasRef}></canvas>
                 
@@ -257,21 +228,52 @@ export default function App() {
                     </div>
                 </div>
 
-                <div id="about-wrapper" className="section-wrapper">
+                <div className="section-wrapper">
                     <div className="section-content">
                         <h2>PROFIL MISI</h2>
-                        <p>{portfolioData.about}</p>
+                        <p>{portfolioData.profile}</p>
                     </div>
                 </div>
 
-                 <div id="projects-wrapper" className="section-wrapper">
+                 <div className="section-wrapper">
+                    <div className="section-content">
+                        <h2>Katalog Keahlian</h2>
+                        <div className="skills-grid">
+                            {portfolioData.skills.map(skillCat => (
+                                <div key={skillCat.category} className="skill-category">
+                                    <h3>{skillCat.category}</h3>
+                                    <ul>
+                                        {skillCat.items.map(item => <li key={item}>{item}</li>)}
+                                    </ul>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="section-wrapper">
+                    <div className="section-content">
+                        <h2>Jejak Organisasi</h2>
+                        <div className="org-timeline">
+                            {portfolioData.organizationalExperience.map(exp => (
+                                <div key={exp.role} className="timeline-item">
+                                    <h3>{exp.role}</h3>
+                                    <h4>{exp.organization} | {exp.duration}</h4>
+                                    <p>{exp.description}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                 <div className="section-wrapper">
                     <div className="section-content">
                         <h2>KONSOL PROYEK</h2>
                         <ProjectsConsole />
                     </div>
                 </div>
                 
-                 <div id="contact-wrapper" className="section-wrapper">
+                 <div className="section-wrapper">
                     <div className="section-content">
                         <h2>SALURAN KOMUNIKASI</h2>
                         <p>Buka saluran komunikasi untuk kolaborasi atau pertanyaan lebih lanjut.</p>
@@ -282,7 +284,6 @@ export default function App() {
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     );
