@@ -11,9 +11,9 @@ const portfolioData = {
     tagline: "Full-Stack Developer & Creative Technologist",
     about: "Selamat datang di portofolio interaktif saya. Saya adalah seorang engineer perangkat lunak dengan hasrat untuk menciptakan pengalaman digital yang mulus dan menarik secara visual. Keahlian saya terletak pada perpaduan antara backend yang tangguh dan frontend yang dinamis.",
     projects: [
-        { title: "Analitik Real-Time", description: "Membangun dasbor analitik performa tinggi yang memproses dan memvisualisasikan jutaan titik data per menit menggunakan arsitektur berbasis event." },
-        { title: "Mesin Rekomendasi", description: "Mengembangkan layanan mikro yang menyediakan rekomendasi produk yang dipersonalisasi, meningkatkan keterlibatan pengguna sebesar 25%." },
-        { title: "Instalasi Seni", description: "Berkolaborasi dalam sebuah instalasi seni generatif yang merespons gerakan pengunjung, menggunakan React dan Three.js untuk menciptakan visual yang imersif." }
+        { title: "SISTEM: ANALITIK REAL-TIME", description: "Membangun dasbor analitik performa tinggi yang memproses dan memvisualisasikan jutaan titik data per menit menggunakan arsitektur berbasis event." },
+        { title: "PROBE: MESIN REKOMENDASI", description: "Mengembangkan layanan mikro yang menyediakan rekomendasi produk yang dipersonalisasi, meningkatkan keterlibatan pengguna sebesar 25%." },
+        { title: "EXPERIMENT: INSTALASI SENI", description: "Berkolaborasi dalam sebuah instalasi seni generatif yang merespons gerakan pengunjung, menggunakan React dan Three.js untuk menciptakan visual yang imersif." }
     ],
     contact: {
         email: "mailto:ganti.dengan.email.valid@anda.com",
@@ -22,48 +22,44 @@ const portfolioData = {
     }
 };
 
-// Komponen untuk Terminal Proyek
-function ProjectsTerminal() {
+// Komponen untuk Sistem Proyek Peta Bintang
+function ProjectsStarSystem() {
     const [activeIndex, setActiveIndex] = useState(0);
-    const descriptionRef = useRef(null);
+    const infoPanelRef = useRef(null);
 
-    const handleTabClick = (index) => {
+    const handleEntryHover = (index) => {
         if (activeIndex === index) return;
         
-        // Animasi fade out
-        gsap.to(descriptionRef.current, {
+        gsap.to(infoPanelRef.current, {
             opacity: 0,
             duration: 0.2,
             ease: 'power2.in',
             onComplete: () => {
-                // Ganti konten setelah fade out
                 setActiveIndex(index);
-                // Animasi fade in
-                gsap.fromTo(descriptionRef.current, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' });
+                gsap.fromTo(infoPanelRef.current, { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' });
             }
         });
     };
 
     return (
-        <div className="projects-terminal">
-            <div className="project-tabs">
+        <div className="projects-system">
+            <div className="star-map-list">
                 {portfolioData.projects.map((project, index) => (
-                    <button 
+                    <div 
                         key={index} 
-                        className={`project-tab ${index === activeIndex ? 'active' : ''}`}
-                        onClick={() => handleTabClick(index)}
+                        className={`star-map-entry ${index === activeIndex ? 'active' : ''}`}
+                        onMouseEnter={() => handleEntryHover(index)}
                     >
                         {project.title}
-                    </button>
+                    </div>
                 ))}
             </div>
-            <div ref={descriptionRef} className="project-description-panel">
+            <div ref={infoPanelRef} className="project-info-panel">
                 <p>{portfolioData.projects[activeIndex].description}</p>
             </div>
         </div>
     );
 }
-
 
 export default function App() {
     const canvasRef = useRef(null);
@@ -120,7 +116,7 @@ export default function App() {
                 pin: true, 
                 scrub: 1.5,
                 start: "top top",
-                end: "+=6000", // PERBAIKAN: Memberi ruang scroll lebih panjang
+                end: "+=6000",
             }
         });
 
@@ -136,17 +132,17 @@ export default function App() {
         });
 
         sections.forEach(section => {
-            const elementsToAnimate = section.querySelectorAll(".section-content > *:not(h2)");
-            gsap.from(section.querySelector("h2"), {
-                 y: 50, opacity: 0, duration: 1, ease: 'power3.out',
-                 scrollTrigger: { trigger: section, containerAnimation: masterTimeline, start: 'left center' }
-            });
-            gsap.from(elementsToAnimate, {
-                y: 50, opacity: 0, duration: 1, ease: 'power3.out', stagger: 0.2,
-                scrollTrigger: { trigger: section, containerAnimation: masterTimeline, start: 'left center+=100' }
+            const content = section.querySelector('.section-content > *');
+            gsap.from(content, {
+                y: 50, opacity: 0, duration: 1, ease: 'power3.out', stagger: 0.15,
+                scrollTrigger: {
+                    trigger: section,
+                    containerAnimation: masterTimeline, 
+                    start: 'left 75%',
+                }
             });
         });
-
+        
         const clock = new THREE.Clock();
         const animate = () => {
             points.rotation.y += clock.getDelta() * 0.05;
@@ -186,24 +182,24 @@ export default function App() {
                 <div className="portfolio-sections">
                     <section className="section">
                         <div className="section-content">
-                            <h2>Tentang Saya</h2>
+                            <h2>Profil Misi</h2>
                             <p>{portfolioData.about}</p>
                         </div>
                     </section>
                     <section className="section">
                         <div className="section-content">
-                            <h2>Proyek Unggulan</h2>
-                            <ProjectsTerminal />
+                            <h2>Peta Bintang Proyek</h2>
+                            <ProjectsStarSystem />
                         </div>
                     </section>
                     <section className="section">
                         <div className="section-content">
-                            <h2>Hubungi Saya</h2>
-                            <p>Tertarik untuk berkolaborasi? Hubungi saya.</p>
+                            <h2>Saluran Komunikasi</h2>
+                            <p>Buka saluran komunikasi untuk kolaborasi atau pertanyaan lebih lanjut.</p>
                             <div className="contact-links">
-                                <a href={portfolioData.contact.email} className="contact-link">Email</a>
-                                <a href={portfolioData.contact.linkedin} target="_blank" rel="noopener noreferrer" className="contact-link">LinkedIn</a>
-                                <a href={portfolioData.contact.github} target="_blank" rel="noopener noreferrer" className="contact-link">GitHub</a>
+                                <a href={portfolioData.contact.email} className="contact-link">TRANSMISI DATA</a>
+                                <a href={portfolioData.contact.linkedin} target="_blank" rel="noopener noreferrer" className="contact-link">LOG PROFESIONAL</a>
+                                <a href={portfolioData.contact.github} target="_blank" rel="noopener noreferrer" className="contact-link">ARSIP KODE</a>
                             </div>
                         </div>
                     </section>
