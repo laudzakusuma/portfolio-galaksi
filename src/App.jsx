@@ -69,43 +69,48 @@ export default function App() {
         const points = new THREE.Points(geometry, material);
         scene.add(points);
         camera.position.set(0, 2, 15);
-
-        // --- Pengaturan Animasi GSAP ---
+        
+        // --- TIMELINE UTAMA GSAP UNTUK SEMUA ANIMASI ---
         const mainContainer = mainContainerRef.current;
         const sections = gsap.utils.toArray(".section");
-
-        // Timeline untuk zoom dan fade
-        gsap.timeline({
+        
+        // Timeline ini mengontrol semua animasi secara berurutan dalam satu scroll
+        const masterTimeline = gsap.timeline({
             scrollTrigger: {
                 trigger: mainContainer,
-                start: "top top",
-                end: "50% bottom", // Zoom selesai di 50% scroll
+                pin: true, // Pin kontainer utama saat animasi berjalan
                 scrub: 1.5,
-            }
-        })
-        .to(camera.position, { z: 2.5, y: -0.2, ease: "power1.inOut" }, 0)
-        .to(points.rotation, { y: Math.PI * 0.25 }, 0)
-        .to('.intro-view', { opacity: 0 }, 0)
-        .fromTo('.portfolio-sections', { opacity: 0 }, { opacity: 1 }, 0.2);
-
-        // Timeline untuk pergeseran horizontal
-        gsap.to(sections, {
-            xPercent: -100 * (sections.length - 1),
-            ease: "none",
-            scrollTrigger: {
-                trigger: mainContainer,
                 start: "top top",
-                end: "bottom bottom",
-                scrub: 1,
-                pin: '.content-container', // Pin kontainer konten
-                snap: {
-                    snapTo: 1 / (sections.length - 1),
-                    duration: 0.5,
+                end: "+=4000", // Menentukan total panjang scroll untuk semua animasi
+                snap: { // Snap ke awal setiap section
+                    snapTo: "labels",
+                    duration: { min: 0.2, max: 1 },
                     ease: "power1.inOut"
                 }
             }
         });
 
+        // 1. Tambahkan label untuk titik awal
+        masterTimeline.addLabel("start");
+
+        // 2. Animasi zoom-in ke galaksi
+        masterTimeline
+            .to(camera.position, { z: 2.5, y: -0.2, ease: "power1.inOut" })
+            .to(points.rotation, { y: Math.PI * 0.25 }, "<") // "<" berarti berjalan bersamaan dengan animasi sebelumnya
+            .to('.intro-view', { opacity: 0 }, "<")
+            .fromTo('.portfolio-sections', { opacity: 0 }, { opacity: 1 }, "<0.5"); // Munculkan section saat zoom
+
+        // 3. Tambahkan label untuk "About" dan animasi geser horizontal
+        masterTimeline.addLabel("about");
+        masterTimeline.to(sections, {
+            xPercent: -100 * (sections.length - 1),
+            ease: "none",
+        });
+        
+        // 4. Tambahkan label untuk section lainnya agar bisa di-snap
+        masterTimeline.addLabel("projects", ">"); // ">" berarti di akhir animasi sebelumnya
+        masterTimeline.addLabel("contact", ">");
+        
         // --- Loop Animasi & Penanganan Resize ---
         const clock = new THREE.Clock();
         const animate = () => {
@@ -134,10 +139,10 @@ export default function App() {
     }, []);
 
     return (
-        // Div ini hanya untuk menciptakan ruang scroll.
-        <div ref={mainContainerRef} style={{ height: '400vh' }}>
-            <canvas id="galaxy-canvas" ref={canvasRef}></canvas>
+        // Div ini adalah kontainer utama yang di-pin oleh GSAP
+        <div ref={mainContainerRef}>
             <div className="content-container">
+                <canvas id="galaxy-canvas" ref={canvasRef}></canvas>
                 {/* Intro View */}
                 <div className="intro-view">
                     <h1>{portfolioData.name}</h1>
