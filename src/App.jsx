@@ -123,6 +123,12 @@ export default function App() {
             galaxyC.visible = false;
             scene.add(galaxyC);
 
+            const galaxyD = generateGalaxy({ count: 200000, size: 0.01, radius: 8, branches: 5, spin: 1, randomness: 0.5, randomnessPower: 4, insideColor: '#ff6030', outsideColor: '#1b3984' });
+            scene.add(galaxyD);
+
+            const galaxyE = generateGalaxy({ count: 200000, size: 0.01, radius: 8, branches: 5, spin: 1, randomness: 0.5, randomnessPower: 4, insideColor: '#ff6030', outsideColor: '#1b3984' });
+            scene.add(galaxyE);
+
 
             camera.position.set(0, 2, 15);
             
@@ -178,6 +184,35 @@ export default function App() {
                 .to(camera.position, { z: 2.5, y: -0.2, ease: "power1.inOut" })
                 .to(galaxyC.rotation, { y: Math.PI * 0.15 }, "<")
                 .to("#contact-wrapper", { autoAlpha: 1, pointerEvents: 'auto' }, "<0.5");
+
+            masterTimeline
+                .to(camera.position, { z: 15, y: 2, ease: "power1.inOut" })
+                .to("#about-wrapper", { autoAlpha: 0, pointerEvents: 'none' }, "<")
+                .to(galaxyA, { onStart: () => { galaxyB.visible = true; } })
+                .to(galaxyA.material, { opacity: 0, onComplete: () => { galaxyA.visible = false; } }, ">-0.5")
+                .to(galaxyB.material, { opacity: 1 }, "<")
+                .to(camera.rotation, { y: Math.PI * 1, ease: "power2.inOut"}, "<");
+
+            masterTimeline
+                .to(camera.position, { z: 3.5, y: 0, ease: "power1.inOut" })
+                .to(galaxyB.rotation, { y: Math.PI * 0.3 }, "<")
+                .to("#projects-wrapper", { autoAlpha: 1, pointerEvents: 'auto' }, "<0.5");
+            
+            masterTimeline.to({}, { duration: 1 });
+
+            masterTimeline
+                .to(camera.position, { z: 15, y: 2, ease: "power1.inOut" })
+                .to("#about-wrapper", { autoAlpha: 0, pointerEvents: 'none' }, "<")
+                .to(galaxyA, { onStart: () => { galaxyB.visible = true; } })
+                .to(galaxyA.material, { opacity: 0, onComplete: () => { galaxyA.visible = false; } }, ">-0.5")
+                .to(galaxyB.material, { opacity: 1 }, "<")
+                .to(camera.rotation, { y: Math.PI * 1, ease: "power2.inOut"}, "<");
+
+                masterTimeline
+                .to(".intro-view", { autoAlpha: 0 })
+                .to(camera.position, { z: 2.5, y: -0.2, ease: "power1.inOut" }, "<")
+                .to(galaxyA.rotation, { y: Math.PI * 0.25 }, "<")
+                .to("#about-wrapper", { autoAlpha: 1, pointerEvents: 'auto' }, "<0.5");
 
 
             const clock = new THREE.Clock();
