@@ -11,7 +11,7 @@ const portfolioData = {
     tagline: "Full-Stack Developer & Creative Technologist",
     about: "Selamat datang di portofolio interaktif saya. Saya adalah seorang engineer perangkat lunak dengan hasrat untuk menciptakan pengalaman digital yang mulus dan menarik secara visual. Keahlian saya terletak pada perpaduan antara backend yang tangguh dan frontend yang dinamis.",
     projects: [
-        { title: "Proyek: Platform Analitik Real-Time", description: "Membangun dasbor analitik performa tinggi yang memproses dan memvisualisasikan jutaan titik data per menit." },
+        { title: "Platform Analitik Real-Time", description: "Membangun dasbor analitik performa tinggi yang memproses dan memvisualisasikan jutaan titik data per menit." },
         { title: "Proyek: Mesin Rekomendasi E-commerce", description: "Mengembangkan layanan mikro yang menyediakan rekomendasi produk yang dipersonalisasi, meningkatkan keterlibatan pengguna sebesar 25%." },
         { title: "Proyek: Instalasi Seni Interaktif", description: "Berkolaborasi dalam sebuah instalasi seni generatif yang merespons gerakan pengunjung, menggunakan React dan Three.js." }
     ],
@@ -74,42 +74,46 @@ export default function App() {
         const mainContainer = mainContainerRef.current;
         const sections = gsap.utils.toArray(".section");
         
-        // Timeline ini mengontrol semua animasi secara berurutan dalam satu scroll
         const masterTimeline = gsap.timeline({
             scrollTrigger: {
                 trigger: mainContainer,
-                pin: true, // Pin kontainer utama saat animasi berjalan
+                pin: true, 
                 scrub: 1.5,
                 start: "top top",
-                end: "+=4000", // Menentukan total panjang scroll untuk semua animasi
-                snap: { // Snap ke awal setiap section
-                    snapTo: "labels",
-                    duration: { min: 0.2, max: 1 },
-                    ease: "power1.inOut"
-                }
+                end: "+=5000",
             }
         });
 
-        // 1. Tambahkan label untuk titik awal
-        masterTimeline.addLabel("start");
-
-        // 2. Animasi zoom-in ke galaksi
         masterTimeline
             .to(camera.position, { z: 2.5, y: -0.2, ease: "power1.inOut" })
-            .to(points.rotation, { y: Math.PI * 0.25 }, "<") // "<" berarti berjalan bersamaan dengan animasi sebelumnya
+            .to(points.rotation, { y: Math.PI * 0.25 }, "<") 
             .to('.intro-view', { opacity: 0 }, "<")
-            .fromTo('.portfolio-sections', { opacity: 0 }, { opacity: 1 }, "<0.5"); // Munculkan section saat zoom
+            .fromTo('.portfolio-sections', { opacity: 0 }, { opacity: 1 }, "<0.5");
 
-        // 3. Tambahkan label untuk "About" dan animasi geser horizontal
-        masterTimeline.addLabel("about");
         masterTimeline.to(sections, {
             xPercent: -100 * (sections.length - 1),
             ease: "none",
         });
-        
-        // 4. Tambahkan label untuk section lainnya agar bisa di-snap
-        masterTimeline.addLabel("projects", ">"); // ">" berarti di akhir animasi sebelumnya
-        masterTimeline.addLabel("contact", ">");
+
+        sections.forEach(section => {
+            const content = section.querySelector('.section-content');
+            // Animasikan elemen di dalam section-content
+            const elementsToAnimate = content.querySelectorAll("h2, p, .projects-list, .contact-links");
+
+            gsap.from(elementsToAnimate, {
+                y: 50,
+                opacity: 0,
+                duration: 1,
+                ease: 'power3.out',
+                stagger: 0.2,
+                scrollTrigger: {
+                    trigger: section,
+                    containerAnimation: masterTimeline, 
+                    start: 'left center', 
+                }
+            });
+        });
+
         
         // --- Loop Animasi & Penanganan Resize ---
         const clock = new THREE.Clock();
@@ -125,10 +129,10 @@ export default function App() {
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            ScrollTrigger.refresh();
         };
         window.addEventListener('resize', handleResize);
 
-        // Fungsi cleanup
         return () => {
             window.removeEventListener('resize', handleResize);
             ScrollTrigger.getAll().forEach(trigger => trigger.kill());
@@ -139,18 +143,15 @@ export default function App() {
     }, []);
 
     return (
-        // Div ini adalah kontainer utama yang di-pin oleh GSAP
-        <div ref={mainContainerRef}>
+        <div ref={mainContainerRef} style={{height: "500vh"}}>
             <div className="content-container">
                 <canvas id="galaxy-canvas" ref={canvasRef}></canvas>
-                {/* Intro View */}
                 <div className="intro-view">
                     <h1>{portfolioData.name}</h1>
                     <p>{portfolioData.tagline}</p>
                     <p className="scroll-prompt">↓ Scroll untuk Memulai ↓</p>
                 </div>
                 
-                {/* Portfolio Sections Container */}
                 <div className="portfolio-sections">
                     <section className="section">
                         <div className="section-content">
@@ -161,9 +162,9 @@ export default function App() {
                     <section className="section">
                         <div className="section-content">
                             <h2>Proyek Unggulan</h2>
-                            <div className="projects-grid">
+                            <div className="projects-list"> 
                                 {portfolioData.projects.map((project, index) => (
-                                    <div key={index} className="project-card">
+                                    <div key={index} className="project-item">
                                         <h3>{project.title}</h3>
                                         <p>{project.description}</p>
                                     </div>
