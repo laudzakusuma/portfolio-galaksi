@@ -9,16 +9,16 @@ gsap.registerPlugin(ScrollTrigger);
 const portfolioData = {
     name: "Yve Leonardo Alexandr",
     tagline: "Web 3 Enthusiast & AI Enhanced Creative Technologist",
-    about: "Selamat datang di portofolio interaktif saya. Saya adalah seorang engineer perangkat lunak dengan hasrat untuk menciptakan pengalaman digital yang mulus dan menarik secara visual. Keahlian saya terletak pada perpaduan antara backend yang tangguh dan frontend yang dinamis.",
+    about: "I'm a Web3 enthusiast and an AI-enhanced creative technologist, driven by a passion for building the future of decentralized digital experiences. My work lives at the intersection of blockchain, artificial intelligence, and interactive design. I'm dedicated to crafting innovative solutions that leverage the power of decentralization and the creative potential of AI to build compelling and meaningful digital worlds.",
     projects: [
-        { title: "SISTEM ANALITIK", description: "Membangun dasbor analitik performa tinggi yang memproses dan memvisualisasikan jutaan titik data per menit menggunakan arsitektur berbasis event." },
-        { title: "MESIN REKOMENDASI", description: "Mengembangkan layanan mikro yang menyediakan rekomendasi produk yang dipersonalisasi, meningkatkan keterlibatan pengguna sebesar 25%." },
-        { title: "INSTALASI SENI", description: "Berkolaborasi dalam sebuah instalasi seni generatif yang merespons gerakan pengunjung, menggunakan React dan Three.js untuk menciptakan visual yang imersif." }
+        { title: "DECENTRALIZED FINANCE", description: "" },
+        { title: "SMART CONTRACTS", description: "" },
+        { title: "AI ARTS", description: "" }
     ],
     contact: {
-        email: "mailto:ganti.dengan.email.valid@anda.com",
-        linkedin: "https://www.linkedin.com/in/username-anda/",
-        github: "https://github.com/username-anda/"
+        cv: "https://drive.google.com/file/d/1mXsEZ8JMJtjHfY7x4z_2fqXMVcQUgsYa/view?usp=drive_link",
+        gmail: "mailto:lauja2608@gmail.com",
+        github: "https://github.com/laudzakusuma"
     }
 };
 
@@ -224,26 +224,26 @@ export default function App() {
 
                 <div id="about-wrapper" className="section-wrapper">
                     <div className="section-content">
-                        <h2>PROFIL MISI</h2>
+                        <h2>PROFILE</h2>
                         <p>{portfolioData.about}</p>
                     </div>
                 </div>
 
                  <div id="projects-wrapper" className="section-wrapper">
                     <div className="section-content">
-                        <h2>KONSOL PROYEK</h2>
+                        <h2>PROJECTS CONSOLE</h2>
                         <ProjectsConsole />
                     </div>
                 </div>
                 
                  <div id="contact-wrapper" className="section-wrapper">
                     <div className="section-content">
-                        <h2>SALURAN KOMUNIKASI</h2>
-                        <p>Buka saluran komunikasi untuk kolaborasi atau pertanyaan lebih lanjut.</p>
+                        <h2>Got a Decentralized Vision?</h2>
+                        <p>Want to collaborate on the next big thing in Web3 or explore how AI can elevate your project? I'm always open to new challenges and ideas. Feel free to reach out!</p>
                          <div className="contact-links">
-                            <a href={portfolioData.contact.email} className="contact-link">TRANSMISI DATA</a>
-                            <a href={portfolioData.contact.linkedin} target="_blank" rel="noopener noreferrer" className="contact-link">LOG PROFESIONAL</a>
-                            <a href={portfolioData.contact.github} target="_blank" rel="noopener noreferrer" className="contact-link">ARSIP KODE</a>
+                            <a href={portfolioData.contact.cv} className="contact-link">CURRICULUM VITAE</a>
+                            <a href={portfolioData.contact.gmail} target="_blank" rel="noopener noreferrer" className="contact-link">GMAIL</a>
+                            <a href={portfolioData.contact.github} target="_blank" rel="noopener noreferrer" className="contact-link">GITHUB</a>
                         </div>
                     </div>
                 </div>
