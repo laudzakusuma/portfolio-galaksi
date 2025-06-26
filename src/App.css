@@ -1,0 +1,41 @@
+/* Gaya dasar & Font */
+body {
+    background-color: #00000a;
+    color: white;
+    font-family: 'Inter', sans-serif;
+    /* Mencegah body scroll, karena scroll dikontrol oleh GSAP */
+    overflow: hidden;
+}
+
+/* Shadow untuk judul */
+.text-shadow-glow {
+    text-shadow: 0 0 20px rgba(100, 180, 255, 0.7);
+}
+
+/* Animasi untuk prompt scroll */
+.scroll-prompt-animation {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); }
+    100% { opacity: 0.5; transform: scale(1); }
+}
+
+/* Styling untuk tombol kontak */
+.contact-link {
+    display: inline-block;
+    padding: 12px 28px;
+    border: 1px solid #22d3ee; /* Warna cyan-400 dari Tailwind */
+    border-radius: 8px;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.contact-link:hover {
+    background-color: #22d3ee;
+    color: #000011;
+}
