@@ -11,9 +11,9 @@ const portfolioData = {
     tagline: "Full-Stack Developer & Creative Technologist",
     about: "Selamat datang di portofolio interaktif saya. Saya adalah seorang engineer perangkat lunak dengan hasrat untuk menciptakan pengalaman digital yang mulus dan menarik secara visual. Keahlian saya terletak pada perpaduan antara backend yang tangguh dan frontend yang dinamis.",
     projects: [
-        { title: "SISTEM: ANALITIK REAL-TIME", description: "Membangun dasbor analitik performa tinggi yang memproses dan memvisualisasikan jutaan titik data per menit menggunakan arsitektur berbasis event." },
-        { title: "PROBE: MESIN REKOMENDASI", description: "Mengembangkan layanan mikro yang menyediakan rekomendasi produk yang dipersonalisasi, meningkatkan keterlibatan pengguna sebesar 25%." },
-        { title: "EXPERIMENT: INSTALASI SENI", description: "Berkolaborasi dalam sebuah instalasi seni generatif yang merespons gerakan pengunjung, menggunakan React dan Three.js untuk menciptakan visual yang imersif." }
+        { title: "SISTEM ANALITIK", description: "Membangun dasbor analitik performa tinggi yang memproses dan memvisualisasikan jutaan titik data per menit menggunakan arsitektur berbasis event." },
+        { title: "MESIN REKOMENDASI", description: "Mengembangkan layanan mikro yang menyediakan rekomendasi produk yang dipersonalisasi, meningkatkan keterlibatan pengguna sebesar 25%." },
+        { title: "INSTALASI SENI", description: "Berkolaborasi dalam sebuah instalasi seni generatif yang merespons gerakan pengunjung, menggunakan React dan Three.js untuk menciptakan visual yang imersif." }
     ],
     contact: {
         email: "mailto:ganti.dengan.email.valid@anda.com",
@@ -22,33 +22,32 @@ const portfolioData = {
     }
 };
 
-// Komponen untuk Sistem Proyek Peta Bintang
-function ProjectsStarSystem() {
+// Komponen baru untuk Sistem Planet Proyek
+function ProjectsPlanetSystem() {
     const [activeIndex, setActiveIndex] = useState(0);
     const infoPanelRef = useRef(null);
 
-    const handleEntryHover = (index) => {
+    const handlePlanetHover = (index) => {
         if (activeIndex === index) return;
         
         gsap.to(infoPanelRef.current, {
-            opacity: 0,
-            duration: 0.2,
-            ease: 'power2.in',
+            opacity: 0, y: 10, duration: 0.3, ease: 'power2.in',
             onComplete: () => {
                 setActiveIndex(index);
-                gsap.fromTo(infoPanelRef.current, { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' });
+                gsap.fromTo(infoPanelRef.current, { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' });
             }
         });
     };
 
     return (
-        <div className="projects-system">
-            <div className="star-map-list">
+        <div className="project-orbit-system">
+            <div className="orbit-container">
+                <div className="orbit-path"></div>
                 {portfolioData.projects.map((project, index) => (
                     <div 
                         key={index} 
-                        className={`star-map-entry ${index === activeIndex ? 'active' : ''}`}
-                        onMouseEnter={() => handleEntryHover(index)}
+                        className={`project-planet p-${index + 1} ${index === activeIndex ? 'active' : ''}`}
+                        onMouseEnter={() => handlePlanetHover(index)}
                     >
                         {project.title}
                     </div>
@@ -64,6 +63,7 @@ function ProjectsStarSystem() {
 export default function App() {
     const canvasRef = useRef(null);
     const mainContainerRef = useRef(null);
+    const contentContainerRef = useRef(null);
 
     useEffect(() => {
         const scene = new THREE.Scene();
@@ -113,7 +113,7 @@ export default function App() {
         const masterTimeline = gsap.timeline({
             scrollTrigger: {
                 trigger: mainContainer,
-                pin: true, 
+                pin: contentContainerRef.current, 
                 scrub: 1.5,
                 start: "top top",
                 end: "+=6000",
@@ -171,7 +171,7 @@ export default function App() {
 
     return (
         <div ref={mainContainerRef} style={{height: "600vh"}}>
-            <div className="content-container">
+            <div ref={contentContainerRef} className="content-container">
                 <canvas id="galaxy-canvas" ref={canvasRef}></canvas>
                 <div className="intro-view">
                     <h1>{portfolioData.name}</h1>
@@ -182,19 +182,19 @@ export default function App() {
                 <div className="portfolio-sections">
                     <section className="section">
                         <div className="section-content">
-                            <h2>Profil Misi</h2>
+                            <h2>PROFIL MISI</h2>
                             <p>{portfolioData.about}</p>
                         </div>
                     </section>
                     <section className="section">
                         <div className="section-content">
-                            <h2>Peta Bintang Proyek</h2>
-                            <ProjectsStarSystem />
+                            <h2>PETA BINTANG PROYEK</h2>
+                            <ProjectsPlanetSystem />
                         </div>
                     </section>
                     <section className="section">
                         <div className="section-content">
-                            <h2>Saluran Komunikasi</h2>
+                            <h2>SALURAN KOMUNIKASI</h2>
                             <p>Buka saluran komunikasi untuk kolaborasi atau pertanyaan lebih lanjut.</p>
                             <div className="contact-links">
                                 <a href={portfolioData.contact.email} className="contact-link">TRANSMISI DATA</a>
