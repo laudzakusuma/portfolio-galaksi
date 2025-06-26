@@ -46,13 +46,11 @@ body {
   justify-content: center;
   align-items: center;
   padding: 20px;
-  /* Opacity dan pointer-events sekarang dikontrol sepenuhnya oleh GSAP */
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
 }
 
-/* Wrapper untuk Intro, dibuat terlihat secara default */
 .intro-view {
   opacity: 1;
   visibility: visible;
@@ -119,7 +117,55 @@ body {
   line-height: 1.7;
 }
 
-/* DESAIN KREATIF: Navigation Console */
+/* SKILL SECTION */
+.skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    text-align: left;
+}
+.skill-category h3 {
+    color: #90cdf4;
+    border-bottom: 1px solid rgba(56, 189, 248, 0.3);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+.skill-category ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.skill-category li {
+    padding: 5px 0;
+    color: rgba(229, 231, 235, 0.8);
+}
+
+/* ORGANIZATIONAL EXPERIENCE SECTION */
+.org-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    text-align: left;
+}
+.timeline-item {
+    padding: 1rem 1.5rem;
+    background: rgba(0,0,0,0.2);
+    border-left: 3px solid #f97316;
+    border-radius: 8px;
+}
+.timeline-item h3 {
+    margin: 0 0 0.25rem 0;
+    color: #90cdf4;
+}
+.timeline-item h4 {
+    margin: 0 0 0.5rem 0;
+    font-weight: 400;
+    font-style: italic;
+    color: rgba(229, 231, 235, 0.7);
+}
+
+
+/* PROJECTS CONSOLE */
 .projects-console {
   display: grid;
   grid-template-columns: 1fr 2fr;

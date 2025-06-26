@@ -9,7 +9,26 @@ gsap.registerPlugin(ScrollTrigger);
 const portfolioData = {
     name: "Nama Anda",
     tagline: "Full-Stack Developer & Creative Technologist",
-    about: "Selamat datang di portofolio interaktif saya. Saya adalah seorang engineer perangkat lunak dengan hasrat untuk menciptakan pengalaman digital yang mulus dan menarik secara visual. Keahlian saya terletak pada perpaduan antara backend yang tangguh dan frontend yang dinamis.",
+    profile: "Selamat datang di portofolio interaktif saya. Saya adalah seorang engineer perangkat lunak dengan hasrat untuk menciptakan pengalaman digital yang mulus dan menarik secara visual. Keahlian saya terletak pada perpaduan antara backend yang tangguh dan frontend yang dinamis.",
+    skills: [
+        { category: "Frontend", items: ["React", "JavaScript (ES6+)", "HTML5 & CSS3", "GSAP", "Three.js"] },
+        { category: "Backend", items: ["Node.js", "Express", "Python", "REST APIs", "GraphQL"] },
+        { category: "Lainnya", items: ["Git & GitHub", "Docker", "MongoDB", "PostgreSQL", "Webpack"] }
+    ],
+    organizationalExperience: [
+        {
+            role: "Ketua Divisi Teknologi",
+            organization: "Himpunan Mahasiswa XYZ",
+            duration: "2023 - 2024",
+            description: "Memimpin tim yang terdiri dari 15 anggota untuk mengembangkan dan memelihara situs web organisasi, serta menyelenggarakan beberapa lokakarya pemrograman untuk mahasiswa."
+        },
+        {
+            role: "Koordinator Acara",
+            organization: "Pekan IT Tahunan",
+            duration: "2022",
+            description: "Merancang dan mengelola serangkaian acara teknologi, termasuk kompetisi coding dan seminar, yang menarik lebih dari 500 peserta dari berbagai universitas."
+        }
+    ],
     projects: [
         { title: "SISTEM ANALITIK", description: "Membangun dasbor analitik performa tinggi yang memproses dan memvisualisasikan jutaan titik data per menit menggunakan arsitektur berbasis event." },
         { title: "MESIN REKOMENDASI", description: "Mengembangkan layanan mikro yang menyediakan rekomendasi produk yang dipersonalisasi, meningkatkan keterlibatan pengguna sebesar 25%." },
@@ -109,12 +128,18 @@ export default function App() {
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             
-            const galaxyA = generateGalaxy({ count: 200000, size: 0.01, radius: 8, branches: 5, spin: 1, randomness: 0.5, randomnessPower: 4, insideColor: '#ff6030', outsideColor: '#1b3984' });
-            scene.add(galaxyA);
+            const galaxies = {
+                A: generateGalaxy({ count: 200000, size: 0.01, radius: 8, branches: 5, spin: 1, insideColor: '#ff6030', outsideColor: '#1b3984' }),
+                B: generateGalaxy({ count: 150000, size: 0.015, radius: 6, branches: 3, spin: -1.5, insideColor: '#90cdf4', outsideColor: '#a855f7' }),
+                C: generateGalaxy({ count: 250000, size: 0.01, radius: 10, branches: 7, spin: 0.5, insideColor: '#4ade80', outsideColor: '#16a34a' }),
+                D: generateGalaxy({ count: 180000, size: 0.012, radius: 7, branches: 4, spin: 2, insideColor: '#facc15', outsideColor: '#b45309' }),
+                E: generateGalaxy({ count: 300000, size: 0.008, radius: 12, branches: 6, spin: -0.8, insideColor: '#f472b6', outsideColor: '#be185d' })
+            };
 
-            const galaxyB = generateGalaxy({ count: 150000, size: 0.015, radius: 6, branches: 3, spin: -1.5, randomness: 0.8, randomnessPower: 3, insideColor: '#90cdf4', outsideColor: '#a855f7' });
-            galaxyB.visible = false;
-            scene.add(galaxyB);
+            Object.values(galaxies).forEach((galaxy, index) => {
+                if (index > 0) galaxy.visible = false;
+                scene.add(galaxy);
+            });
 
             camera.position.set(0, 2, 15);
             
@@ -126,45 +151,37 @@ export default function App() {
                     pin: contentContainerRef.current, 
                     scrub: 1.5,
                     start: "top top",
-                    end: "bottom+=100% bottom", // PERBAIKAN: Akhir scroll dinamis
+                    end: "bottom+=400% bottom", 
                 }
             });
 
-            // Bagian 1: Zoom ke Galaksi A (About & Contact)
-            masterTimeline
-                .to(".intro-view", { autoAlpha: 0 }) // autoAlpha = opacity + visibility
-                .to(camera.position, { z: 2.5, y: -0.2, ease: "power1.inOut" }, "<")
-                .to(galaxyA.rotation, { y: Math.PI * 0.25 }, "<")
-                .to("#about-contact-wrapper", { autoAlpha: 1, pointerEvents: 'auto' }, "<0.5");
+            const createGalaxyTransition = (from, to, wrapperId) => {
+                masterTimeline.to(camera.position, { z: 15, y: 2, ease: "power1.inOut" });
+                masterTimeline.to(`#${from.wrapper}-wrapper`, { autoAlpha: 0, pointerEvents: 'none' }, "<");
+                
+                masterTimeline.to(from.galaxy, { onStart: () => { to.galaxy.visible = true; }});
+                masterTimeline.to(from.galaxy.material, { opacity: 0, onComplete: () => { from.galaxy.visible = false; }}, ">-0.5");
+                masterTimeline.to(to.galaxy.material, { opacity: 1 }, "<");
+                masterTimeline.to(camera.rotation, { y: `+=${Math.PI * 0.5}`, ease: "power2.inOut"}, "<");
 
-            // Bagian 2: Tahan sebentar untuk melihat konten
-            masterTimeline.to({}, { duration: 1 }); 
-
-            // Bagian 3: Zoom out dari Galaksi A
-            masterTimeline
-                .to(camera.position, { z: 15, y: 2, ease: "power1.inOut" })
-                .to("#about-contact-wrapper", { autoAlpha: 0, pointerEvents: 'none' }, "<");
+                masterTimeline.to(camera.position, { z: 2.5, y: -0.2, ease: "power1.inOut" });
+                masterTimeline.to(to.galaxy.rotation, { y: `+=${Math.PI * 0.15}` }, "<");
+                masterTimeline.to(`#${to.wrapper}-wrapper`, { autoAlpha: 1, pointerEvents: 'auto' }, "<0.5");
+                masterTimeline.to({}, { duration: 1.5 }); // Tahan
+            };
             
-            // Bagian 4: Transisi antar galaksi
-            masterTimeline
-                .to(galaxyA, { onStart: () => { galaxyB.visible = true; } }) // Tampilkan galaksi B sebelum transisi
-                .to(galaxyA.material, { opacity: 0 }, ">-0.5") // Mulai fade out galaksi A
-                .to(galaxyB.material, { opacity: 1 }, "<") // Fade in galaksi B bersamaan
-                .to(camera.rotation, { y: Math.PI, ease: "power2.inOut"}, "<");
-
-            // Bagian 5: Zoom ke Galaksi B (Projects)
-            masterTimeline
-                .to(camera.position, { z: 3.5, y: 0, ease: "power1.inOut" })
-                .to(galaxyB.rotation, { y: Math.PI * 0.3 }, "<")
-                .to("#projects-wrapper", { autoAlpha: 1, pointerEvents: 'auto' }, "<0.5");
-            
-            masterTimeline.to({}, { duration: 1 }); // Tahan di galaksi B
+            // Perjalanan Antar Galaksi
+            masterTimeline.to(".intro-view", { autoAlpha: 0 });
+            createGalaxyTransition({ galaxy: galaxies.A, wrapper: 'none' }, { galaxy: galaxies.A, wrapper: 'profile' }); // Initial zoom-in
+            createGalaxyTransition({ galaxy: galaxies.A, wrapper: 'profile' }, { galaxy: galaxies.B, wrapper: 'skills' });
+            createGalaxyTransition({ galaxy: galaxies.B, wrapper: 'skills' }, { galaxy: galaxies.C, wrapper: 'org' });
+            createGalaxyTransition({ galaxy: galaxies.C, wrapper: 'org' }, { galaxy: galaxies.D, wrapper: 'projects' });
+            createGalaxyTransition({ galaxy: galaxies.D, wrapper: 'projects' }, { galaxy: galaxies.E, wrapper: 'contact' });
 
             const clock = new THREE.Clock();
             const animate = () => {
                 const delta = clock.getDelta();
-                galaxyA.rotation.y += delta * 0.05;
-                galaxyB.rotation.y += delta * 0.08;
+                Object.values(galaxies).forEach((g, i) => g.rotation.y += delta * (0.05 + i * 0.01));
                 renderer.render(scene, camera);
                 requestAnimationFrame(animate);
             };
@@ -179,19 +196,17 @@ export default function App() {
             };
             window.addEventListener('resize', handleResize);
             
-            // Cleanup context GSAP
             return () => {
                 window.removeEventListener('resize', handleResize);
                 renderer.dispose();
-                // Geometri & material akan dibersihkan oleh context
             };
-        }, mainContainerRef); // Mengikat context ke kontainer utama
+        }, mainContainerRef);
 
-        return () => ctx.revert(); // Fungsi cleanup utama untuk GSAP
+        return () => ctx.revert();
     }, []);
 
     return (
-        <div ref={mainContainerRef} style={{height: "500vh"}}>
+        <div ref={mainContainerRef} style={{height: "1200vh"}}>
             <div ref={contentContainerRef} className="content-container">
                 <canvas id="galaxy-canvas" ref={canvasRef}></canvas>
                 
@@ -203,14 +218,40 @@ export default function App() {
                     </div>
                 </div>
 
-                <div id="about-contact-wrapper" className="section-wrapper">
+                <div id="profile-wrapper" className="section-wrapper">
                     <div className="section-content">
                         <h2>PROFIL MISI</h2>
-                        <p>{portfolioData.about}</p>
-                         <div className="contact-links">
-                            <a href={portfolioData.contact.email} className="contact-link">TRANSMISI DATA</a>
-                            <a href={portfolioData.contact.linkedin} target="_blank" rel="noopener noreferrer" className="contact-link">LOG PROFESIONAL</a>
-                            <a href={portfolioData.contact.github} target="_blank" rel="noopener noreferrer" className="contact-link">ARSIP KODE</a>
+                        <p>{portfolioData.profile}</p>
+                    </div>
+                </div>
+
+                 <div id="skills-wrapper" className="section-wrapper">
+                    <div className="section-content">
+                        <h2>Katalog Keahlian</h2>
+                        <div className="skills-grid">
+                            {portfolioData.skills.map(skillCat => (
+                                <div key={skillCat.category} className="skill-category">
+                                    <h3>{skillCat.category}</h3>
+                                    <ul>
+                                        {skillCat.items.map(item => <li key={item}>{item}</li>)}
+                                    </ul>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                <div id="org-wrapper" className="section-wrapper">
+                    <div className="section-content">
+                        <h2>Jejak Organisasi</h2>
+                        <div className="org-timeline">
+                            {portfolioData.organizationalExperience.map(exp => (
+                                <div key={exp.role} className="timeline-item">
+                                    <h3>{exp.role}</h3>
+                                    <h4>{exp.organization} | {exp.duration}</h4>
+                                    <p>{exp.description}</p>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>
@@ -221,7 +262,18 @@ export default function App() {
                         <ProjectsConsole />
                     </div>
                 </div>
-
+                
+                 <div id="contact-wrapper" className="section-wrapper">
+                    <div className="section-content">
+                        <h2>SALURAN KOMUNIKASI</h2>
+                        <p>Buka saluran komunikasi untuk kolaborasi atau pertanyaan lebih lanjut.</p>
+                         <div className="contact-links">
+                            <a href={portfolioData.contact.email} className="contact-link">TRANSMISI DATA</a>
+                            <a href={portfolioData.contact.linkedin} target="_blank" rel="noopener noreferrer" className="contact-link">LOG PROFESIONAL</a>
+                            <a href={portfolioData.contact.github} target="_blank" rel="noopener noreferrer" className="contact-link">ARSIP KODE</a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );
