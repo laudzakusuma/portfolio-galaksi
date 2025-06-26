@@ -10,7 +10,6 @@
 body {
   margin: 0;
   padding: 0;
-  overscroll-behavior: none; /* Mencegah efek "bounce" saat scroll */
 }
 
 *, *::before, *::after {
@@ -36,19 +35,32 @@ body {
   overflow: hidden; 
 }
 
-/* Tampilan Intro */
-.intro-view {
+/* Base style untuk semua section content */
+.section-wrapper {
   width: 100%;
   height: 100%;
   position: absolute;
   top: 0;
   left: 0;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  text-align: center;
   padding: 20px;
+  /* Opacity dan pointer-events sekarang dikontrol sepenuhnya oleh GSAP */
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Wrapper untuk Intro, dibuat terlihat secara default */
+.intro-view {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.intro-view-content {
+  text-align: center;
 }
 
 .intro-view h1 {
@@ -78,26 +90,6 @@ body {
   100% { opacity: 0.6; }
 }
 
-/* Kontainer Section Portofolio */
-.portfolio-sections {
-  display: flex;
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  opacity: 0;
-  will-change: transform;
-}
-
-.section {
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 40px;
-  flex-shrink: 0;
-}
 
 /* DESAIN KREATIF: Holographic Panel */
 .section-content {
@@ -110,6 +102,7 @@ body {
   -webkit-backdrop-filter: blur(15px);
   padding: 40px;
   box-shadow: 0 0 50px rgba(0,0,0,0.6), inset 0 0 20px rgba(56, 189, 248, 0.1);
+  text-align: center;
 }
 
 .section-content h2 {
@@ -151,7 +144,6 @@ body {
   border-radius: 5px;
   cursor: pointer;
   transition: all 0.3s ease;
-  position: relative;
 }
 
 .target-item:hover {
@@ -171,8 +163,6 @@ body {
   background-color: rgba(0,0,0,0.3);
   border-radius: 10px;
   border: 1px solid rgba(56, 189, 248, 0.1);
-  position: relative;
-  overflow: hidden;
 }
 
 .hologram-screen h3 {

@@ -22,38 +22,42 @@ const portfolioData = {
     }
 };
 
-// Komponen baru untuk Sistem Planet Proyek
-function ProjectsPlanetSystem() {
+// Komponen baru untuk Konsol Proyek
+function ProjectsConsole() {
     const [activeIndex, setActiveIndex] = useState(0);
-    const infoPanelRef = useRef(null);
+    const hologramScreenRef = useRef(null);
 
-    const handlePlanetClick = (index) => {
+    const handleTargetClick = (index) => {
         if (activeIndex === index) return;
         
-        gsap.to(infoPanelRef.current, {
-            opacity: 0, y: 15, duration: 0.3, ease: 'power2.in',
+        gsap.to(hologramScreenRef.current, {
+            opacity: 0,
+            duration: 0.3,
+            ease: 'power2.in',
             onComplete: () => {
                 setActiveIndex(index);
-                gsap.fromTo(infoPanelRef.current, { opacity: 0, y: -15 }, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' });
+                gsap.fromTo(hologramScreenRef.current, 
+                    { opacity: 0, y: 20, filter: 'blur(5px)' }, 
+                    { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.4, ease: 'power2.out' }
+                );
             }
         });
     };
 
     return (
-        <div className="project-orbit-system">
-            <div className="orbit-container">
-                <div className="orbit-path"></div>
+        <div className="projects-console">
+            <div className="targets-list">
                 {portfolioData.projects.map((project, index) => (
                     <div 
                         key={index} 
-                        className={`project-planet p-${index} ${index === activeIndex ? 'active' : ''}`}
-                        onClick={() => handlePlanetClick(index)}
+                        className={`target-item ${index === activeIndex ? 'active' : ''}`}
+                        onClick={() => handleTargetClick(index)}
                     >
                         {project.title}
                     </div>
                 ))}
             </div>
-            <div ref={infoPanelRef} className="project-info-panel">
+            <div ref={hologramScreenRef} className="hologram-screen">
                 <h3>{portfolioData.projects[activeIndex].title}</h3>
                 <p>{portfolioData.projects[activeIndex].description}</p>
             </div>
@@ -61,150 +65,163 @@ function ProjectsPlanetSystem() {
     );
 }
 
+// Fungsi helper untuk membuat galaksi
+const generateGalaxy = (parameters) => {
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(parameters.count * 3);
+    const colors = new Float32Array(parameters.count * 3);
+    const colorInside = new THREE.Color(parameters.insideColor);
+    const colorOutside = new THREE.Color(parameters.outsideColor);
+
+    for (let i = 0; i < parameters.count; i++) {
+        const i3 = i * 3;
+        const radius = Math.random() * parameters.radius;
+        const spinAngle = radius * parameters.spin;
+        const branchAngle = (i % parameters.branches) / parameters.branches * Math.PI * 2;
+        const randomX = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
+        const randomY = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
+        const randomZ = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
+        positions[i3] = Math.cos(branchAngle + spinAngle) * radius + randomX;
+        positions[i3 + 1] = randomY;
+        positions[i3 + 2] = Math.sin(branchAngle + spinAngle) * radius + randomZ;
+        const mixedColor = colorInside.clone();
+        mixedColor.lerp(colorOutside, radius / parameters.radius);
+        colors[i3] = mixedColor.r; colors[i3 + 1] = mixedColor.g; colors[i3 + 2] = mixedColor.b;
+    }
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    const material = new THREE.PointsMaterial({ size: parameters.size, sizeAttenuation: true, depthWrite: false, blending: THREE.AdditiveBlending, vertexColors: true, transparent: true, opacity: 1 });
+    return new THREE.Points(geometry, material);
+};
+
+
 export default function App() {
     const canvasRef = useRef(null);
     const mainContainerRef = useRef(null);
     const contentContainerRef = useRef(null);
 
     useEffect(() => {
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({
-            canvas: canvasRef.current,
-            antialias: true,
-            alpha: true,
-        });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-        const parameters = { count: 200000, size: 0.01, radius: 8, branches: 5, spin: 1, randomness: 0.5, randomnessPower: 4, insideColor: '#ff6030', outsideColor: '#1b3984' };
-        
-        const geometry = new THREE.BufferGeometry();
-        const positions = new Float32Array(parameters.count * 3);
-        const colors = new Float32Array(parameters.count * 3);
-        const colorInside = new THREE.Color(parameters.insideColor);
-        const colorOutside = new THREE.Color(parameters.outsideColor);
-
-        for (let i = 0; i < parameters.count; i++) {
-            const i3 = i * 3;
-            const radius = Math.random() * parameters.radius;
-            const spinAngle = radius * parameters.spin;
-            const branchAngle = (i % parameters.branches) / parameters.branches * Math.PI * 2;
-            const randomX = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
-            const randomY = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
-            const randomZ = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
-            positions[i3] = Math.cos(branchAngle + spinAngle) * radius + randomX;
-            positions[i3 + 1] = randomY;
-            positions[i3 + 2] = Math.sin(branchAngle + spinAngle) * radius + randomZ;
-            const mixedColor = colorInside.clone();
-            mixedColor.lerp(colorOutside, radius / parameters.radius);
-            colors[i3] = mixedColor.r; colors[i3 + 1] = mixedColor.g; colors[i3 + 2] = mixedColor.b;
-        }
-
-        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-        const material = new THREE.PointsMaterial({ size: parameters.size, sizeAttenuation: true, depthWrite: false, blending: THREE.AdditiveBlending, vertexColors: true });
-        const points = new THREE.Points(geometry, material);
-        scene.add(points);
-        camera.position.set(0, 2, 15);
-        
-        const mainContainer = mainContainerRef.current;
-        const sections = gsap.utils.toArray(".section");
-        
-        const masterTimeline = gsap.timeline({
-            scrollTrigger: {
-                trigger: mainContainer,
-                pin: contentContainerRef.current, 
-                scrub: 1.5,
-                start: "top top",
-                end: "+=6000",
-            }
-        });
-
-        masterTimeline
-            .to(camera.position, { z: 2.5, y: -0.2, ease: "power1.inOut" })
-            .to(points.rotation, { y: Math.PI * 0.25 }, "<") 
-            .to('.intro-view', { opacity: 0 }, "<")
-            .fromTo('.portfolio-sections', { opacity: 0 }, { opacity: 1 }, "<0.5");
-
-        masterTimeline.to(sections, {
-            xPercent: -100 * (sections.length - 1),
-            ease: "none",
-        });
-
-        sections.forEach(section => {
-            const content = section.querySelector('.section-content > *');
-            gsap.from(content, {
-                y: 50, opacity: 0, duration: 1, ease: 'power3.out', stagger: 0.15,
-                scrollTrigger: {
-                    trigger: section,
-                    containerAnimation: masterTimeline, 
-                    start: 'left 75%',
-                }
-            });
-        });
-        
-        const clock = new THREE.Clock();
-        const animate = () => {
-            points.rotation.y += clock.getDelta() * 0.05;
-            renderer.render(scene, camera);
-            requestAnimationFrame(animate);
-        };
-        animate();
-
-        const handleResize = () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
+        let ctx = gsap.context(() => {
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas: canvasRef.current, antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            ScrollTrigger.refresh();
-        };
-        window.addEventListener('resize', handleResize);
+            
+            const galaxyA = generateGalaxy({ count: 200000, size: 0.01, radius: 8, branches: 5, spin: 1, randomness: 0.5, randomnessPower: 4, insideColor: '#ff6030', outsideColor: '#1b3984' });
+            scene.add(galaxyA);
 
-        return () => {
-            window.removeEventListener('resize', handleResize);
-            ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-            renderer.dispose();
-            geometry.dispose();
-            material.dispose();
-        };
+            const galaxyB = generateGalaxy({ count: 150000, size: 0.015, radius: 6, branches: 3, spin: -1.5, randomness: 0.8, randomnessPower: 3, insideColor: '#90cdf4', outsideColor: '#a855f7' });
+            galaxyB.visible = false;
+            scene.add(galaxyB);
+
+            camera.position.set(0, 2, 15);
+            
+            const mainContainer = mainContainerRef.current;
+            
+            const masterTimeline = gsap.timeline({
+                scrollTrigger: {
+                    trigger: mainContainer,
+                    pin: contentContainerRef.current, 
+                    scrub: 1.5,
+                    start: "top top",
+                    end: "bottom+=100% bottom", // PERBAIKAN: Akhir scroll dinamis
+                }
+            });
+
+            // Bagian 1: Zoom ke Galaksi A (About & Contact)
+            masterTimeline
+                .to(".intro-view", { autoAlpha: 0 }) // autoAlpha = opacity + visibility
+                .to(camera.position, { z: 2.5, y: -0.2, ease: "power1.inOut" }, "<")
+                .to(galaxyA.rotation, { y: Math.PI * 0.25 }, "<")
+                .to("#about-contact-wrapper", { autoAlpha: 1, pointerEvents: 'auto' }, "<0.5");
+
+            // Bagian 2: Tahan sebentar untuk melihat konten
+            masterTimeline.to({}, { duration: 1 }); 
+
+            // Bagian 3: Zoom out dari Galaksi A
+            masterTimeline
+                .to(camera.position, { z: 15, y: 2, ease: "power1.inOut" })
+                .to("#about-contact-wrapper", { autoAlpha: 0, pointerEvents: 'none' }, "<");
+            
+            // Bagian 4: Transisi antar galaksi
+            masterTimeline
+                .to(galaxyA, { onStart: () => { galaxyB.visible = true; } }) // Tampilkan galaksi B sebelum transisi
+                .to(galaxyA.material, { opacity: 0 }, ">-0.5") // Mulai fade out galaksi A
+                .to(galaxyB.material, { opacity: 1 }, "<") // Fade in galaksi B bersamaan
+                .to(camera.rotation, { y: Math.PI, ease: "power2.inOut"}, "<");
+
+            // Bagian 5: Zoom ke Galaksi B (Projects)
+            masterTimeline
+                .to(camera.position, { z: 3.5, y: 0, ease: "power1.inOut" })
+                .to(galaxyB.rotation, { y: Math.PI * 0.3 }, "<")
+                .to("#projects-wrapper", { autoAlpha: 1, pointerEvents: 'auto' }, "<0.5");
+            
+            masterTimeline.to({}, { duration: 1 }); // Tahan di galaksi B
+
+            const clock = new THREE.Clock();
+            const animate = () => {
+                const delta = clock.getDelta();
+                galaxyA.rotation.y += delta * 0.05;
+                galaxyB.rotation.y += delta * 0.08;
+                renderer.render(scene, camera);
+                requestAnimationFrame(animate);
+            };
+            animate();
+
+            const handleResize = () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                ScrollTrigger.refresh(true);
+            };
+            window.addEventListener('resize', handleResize);
+            
+            // Cleanup context GSAP
+            return () => {
+                window.removeEventListener('resize', handleResize);
+                renderer.dispose();
+                // Geometri & material akan dibersihkan oleh context
+            };
+        }, mainContainerRef); // Mengikat context ke kontainer utama
+
+        return () => ctx.revert(); // Fungsi cleanup utama untuk GSAP
     }, []);
 
     return (
-        <div ref={mainContainerRef} style={{height: "600vh"}}>
+        <div ref={mainContainerRef} style={{height: "500vh"}}>
             <div ref={contentContainerRef} className="content-container">
                 <canvas id="galaxy-canvas" ref={canvasRef}></canvas>
-                <div className="intro-view">
-                    <h1>{portfolioData.name}</h1>
-                    <p>{portfolioData.tagline}</p>
-                    <p className="scroll-prompt">↓ Scroll untuk Memulai ↓</p>
-                </div>
                 
-                <div className="portfolio-sections">
-                    <section className="section">
-                        <div className="section-content">
-                            <h2>PROFIL MISI</h2>
-                            <p>{portfolioData.about}</p>
-                        </div>
-                    </section>
-                    <section className="section">
-                        <div className="section-content">
-                            <h2>SISTEM PROYEK</h2>
-                            <ProjectsPlanetSystem />
-                        </div>
-                    </section>
-                    <section className="section">
-                        <div className="section-content">
-                            <h2>SALURAN KOMUNIKASI</h2>
-                            <p>Buka saluran komunikasi untuk kolaborasi atau pertanyaan lebih lanjut.</p>
-                            <div className="contact-links">
-                                <a href={portfolioData.contact.email} className="contact-link">TRANSMISI DATA</a>
-                                <a href={portfolioData.contact.linkedin} target="_blank" rel="noopener noreferrer" className="contact-link">LOG PROFESIONAL</a>
-                                <a href={portfolioData.contact.github} target="_blank" rel="noopener noreferrer" className="contact-link">ARSIP KODE</a>
-                            </div>
-                        </div>
-                    </section>
+                <div className="section-wrapper intro-view">
+                    <div className="intro-view-content">
+                      <h1>{portfolioData.name}</h1>
+                      <p>{portfolioData.tagline}</p>
+                      <p className="scroll-prompt">↓ Scroll untuk Memulai ↓</p>
+                    </div>
                 </div>
+
+                <div id="about-contact-wrapper" className="section-wrapper">
+                    <div className="section-content">
+                        <h2>PROFIL MISI</h2>
+                        <p>{portfolioData.about}</p>
+                         <div className="contact-links">
+                            <a href={portfolioData.contact.email} className="contact-link">TRANSMISI DATA</a>
+                            <a href={portfolioData.contact.linkedin} target="_blank" rel="noopener noreferrer" className="contact-link">LOG PROFESIONAL</a>
+                            <a href={portfolioData.contact.github} target="_blank" rel="noopener noreferrer" className="contact-link">ARSIP KODE</a>
+                        </div>
+                    </div>
+                </div>
+
+                 <div id="projects-wrapper" className="section-wrapper">
+                    <div className="section-content">
+                        <h2>KONSOL PROYEK</h2>
+                        <ProjectsConsole />
+                    </div>
+                </div>
+
             </div>
         </div>
     );
