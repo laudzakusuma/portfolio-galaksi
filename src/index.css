@@ -53,7 +53,7 @@ body {
   font-size: 2.8rem;
   font-weight: 700;
   margin: 0;
-  text-shadow: 0 0 25px rgba(137, 207, 235, 0.7); /* Sky-blue glow */
+  text-shadow: 0 0 25px rgba(137, 207, 235, 0.7);
 }
 
 .intro-view p {
@@ -65,7 +65,7 @@ body {
 .scroll-prompt {
   margin-top: 2.5rem;
   font-size: 0.9rem;
-  color: #ff8c42; /* Aksen oranye yang cocok dengan galaksi */
+  color: #ff8c42;
   animation: pulse 2s infinite;
 }
 
@@ -97,17 +97,18 @@ body {
   flex-shrink: 0;
 }
 
+/* DESAIN KREATIF: Holographic Terminal */
 .section-content {
   max-width: 900px;
   width: 100%;
-  background: radial-gradient(circle, rgba(17, 34, 68, 0.8) 0%, rgba(10, 25, 47, 0.85) 100%);
+  background: linear-gradient(145deg, rgba(17, 34, 68, 0.7) 0%, rgba(10, 25, 47, 0.75) 100%);
   border-radius: 20px;
   border: 1px solid rgba(137, 207, 235, 0.2);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
   padding: 40px;
   text-align: center;
-  box-shadow: 0 0 40px rgba(0,0,0,0.5);
+  box-shadow: 0 0 50px rgba(0,0,0,0.6), inset 0 0 15px rgba(137, 207, 235, 0.1);
   transform-style: preserve-3d;
 }
 
@@ -125,62 +126,50 @@ body {
   line-height: 1.7;
 }
 
-/* DESAIN BARU: Project List (Menggantikan Grid) */
-.projects-list {
+/* DESAIN KREATIF: Project Terminal */
+.projects-terminal {
   display: flex;
   flex-direction: column;
-  gap: 1px; /* Garis tipis pemisah */
+  gap: 1.5rem;
   text-align: left;
   margin-top: 2rem;
-  background-color: rgba(255, 140, 66, 0.1); /* Warna latar untuk kontainer list */
-  border-radius: 10px;
-  overflow: hidden; /* Agar border-radius diterapkan pada anak-elemen */
+  min-height: 250px;
 }
 
-.project-item {
+.project-tabs {
   display: flex;
-  flex-direction: column;
-  padding: 1.5rem;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.project-tab {
+  padding: 10px 15px;
   background-color: rgba(10, 25, 47, 0.8);
-  position: relative;
-  transition: background-color 0.4s ease;
+  border: 1px solid rgba(255, 140, 66, 0.2);
+  color: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.project-item:hover {
-  background-color: rgba(23, 42, 69, 0.9);
-}
-
-.project-item h3 {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.25rem;
-  color: #90cdf4; /* Biru muda */
-  display: flex;
-  align-items: center;
-}
-
-/* Efek garis bercahaya di depan judul */
-.project-item h3::before {
-  content: '';
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
+.project-tab.active {
   background-color: #ff8c42;
-  margin-right: 15px;
-  box-shadow: 0 0 8px #ff8c42;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  color: #000011;
+  font-weight: bold;
+  box-shadow: 0 0 15px rgba(255, 140, 66, 0.5);
 }
 
-.project-item:hover h3::before {
-  transform: scale(1.2);
-  box-shadow: 0 0 15px #ff8c42;
+.project-description-panel {
+  padding: 20px;
+  background-color: rgba(0,0,0,0.2);
+  border-radius: 10px;
+  border: 1px solid rgba(137, 207, 235, 0.1);
 }
 
-.project-item p {
+.project-description-panel p {
     font-size: 1rem;
     line-height: 1.6;
-    color: rgba(255, 255, 255, 0.7);
-    padding-left: 27px; /* Sejajarkan dengan teks judul */
+    margin: 0;
 }
 
 /* Kontak */
@@ -210,16 +199,5 @@ body {
 @media (min-width: 768px) {
   .intro-view h1, .section-content h2 {
     font-size: 3.5rem;
-  }
-  .project-item {
-    flex-direction: row;
-    align-items: center;
-    gap: 2rem;
-  }
-  .project-item h3 {
-     margin-bottom: 0;
-  }
-  .project-item p {
-    padding-left: 0;
   }
 }
