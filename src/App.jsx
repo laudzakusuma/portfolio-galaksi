@@ -27,14 +27,14 @@ function ProjectsPlanetSystem() {
     const [activeIndex, setActiveIndex] = useState(0);
     const infoPanelRef = useRef(null);
 
-    const handlePlanetHover = (index) => {
+    const handlePlanetClick = (index) => {
         if (activeIndex === index) return;
         
         gsap.to(infoPanelRef.current, {
-            opacity: 0, y: 10, duration: 0.3, ease: 'power2.in',
+            opacity: 0, y: 15, duration: 0.3, ease: 'power2.in',
             onComplete: () => {
                 setActiveIndex(index);
-                gsap.fromTo(infoPanelRef.current, { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' });
+                gsap.fromTo(infoPanelRef.current, { opacity: 0, y: -15 }, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' });
             }
         });
     };
@@ -46,14 +46,15 @@ function ProjectsPlanetSystem() {
                 {portfolioData.projects.map((project, index) => (
                     <div 
                         key={index} 
-                        className={`project-planet p-${index + 1} ${index === activeIndex ? 'active' : ''}`}
-                        onMouseEnter={() => handlePlanetHover(index)}
+                        className={`project-planet p-${index} ${index === activeIndex ? 'active' : ''}`}
+                        onClick={() => handlePlanetClick(index)}
                     >
                         {project.title}
                     </div>
                 ))}
             </div>
             <div ref={infoPanelRef} className="project-info-panel">
+                <h3>{portfolioData.projects[activeIndex].title}</h3>
                 <p>{portfolioData.projects[activeIndex].description}</p>
             </div>
         </div>
@@ -188,7 +189,7 @@ export default function App() {
                     </section>
                     <section className="section">
                         <div className="section-content">
-                            <h2>PETA BINTANG PROYEK</h2>
+                            <h2>SISTEM PROYEK</h2>
                             <ProjectsPlanetSystem />
                         </div>
                     </section>
